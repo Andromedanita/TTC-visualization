@@ -1,17 +1,18 @@
 import csv
-import numpy as np
+import numpy            as np
 import matplotlib.pylab as plt
-from   delay_code import stations
+from   delay_code       import stations
 
 plt.ion()
 
 # opening the data file
 with open('/Users/anita/Documents/Renee_presentation_course/ttc-vis/data/delay_codes_2014-2017.csv', 'rU') as csvfile:
-    reader     = csv.reader(csvfile)
+    reader      = csv.reader(csvfile)
     delay_list  = list(reader)
 
-delay_array = np.array(delay_list)
+delay_array   = np.array(delay_list)
 
+# columns of data 
 delay_date    = delay_array[:,0]
 delay_time    = delay_array[:,1]
 delay_day     = delay_array[:,2]
@@ -23,14 +24,14 @@ delay_bound   = delay_array[:,7]
 delay_line    = delay_array[:,8]
 delay_veh     = delay_array[:,9]
 
-# extracting year values from file
+# extracting year values from file (b/c those are stored as strings)
 years = []
 for i in range(len(delay_date)):
     years.append(delay_date[i][0:4])
 years = np.array(years)
 
 
-# Code categories
+# Delay code categories
 train      = ['EUBO','EUAC','EUDO','EUTRD','MUODC','MUSAN','PUOPO','PUSCR','TUDOE','TUSET','TUST']
 employee   = ['EUME','EUOE','MUCL','MUESA','MUIE','MULD','MUNOA','MUTD','MUWR','SUAE','TUCC','TUMVS','TUNIP','TUNOA','TUOPO','TUOS','TUS','TUSC','TUSUP']
 signals    = ['PUCSC','PUCSS','PUSI','PUSIS','PUSNT','PUSO','PUSSW','PUSTS','PUSWZ','PUTSC']
@@ -42,9 +43,10 @@ weather    = ['MUWEA','PUTIS']
 misc       = ['MUGD','MUO','MULPA','MUPLB','MUPLC','MUSC','MUTO','PUSEA','TUML','TUO']
 
 
-
-
+# determines which category the delay in each station in 2015 belongs to and 
+# returns the number of occurance of each delay category
 def comp_stacked_bar(station_name):
+    # station name can be part pf the full name
     cat_train    = []
     cat_employee = []
     cat_signals  = []
@@ -56,15 +58,17 @@ def comp_stacked_bar(station_name):
     cat_misc     = []
 
     vals_station = []
+    
+    # to find the values for the given station
     stations(station_name, vals_station)
-
-    #print "shape of stations", np.shape(vals_station)
+    
+    # finding all rows that belong to year 2015
     indx_station = np.where(years[vals_station] == '2015')
 
+    # categorizing the delay codes
     for i in range(np.shape(indx_station[0])[0]):
         if delay_code[indx_station][i] in train:
             cat_train.append(delay_code[indx_station][i])
-            #print "shape of train is", np.shape(cat_train)
         elif delay_code[indx_station][i] in employee:
             cat_employee.append(delay_code[indx_station][i])
         elif delay_code[indx_station][i] in signals:
@@ -82,22 +86,19 @@ def comp_stacked_bar(station_name):
         elif delay_code[indx_station][i] in misc:
             cat_misc.append(delay_code[indx_station][i])
             
-        #print "cat employee", cat_employee
-
     return np.shape(cat_train)[0], np.shape(cat_employee)[0], np.shape(cat_signals)[0], np.shape(cat_track)[0], np.shape(cat_station)[0], np.shape(cat_other)[0], np.shape(cat_pass)[0], np.shape(cat_weather)[0], np.shape(cat_misc)[0]
 
-
-
+# function to plot stacked bars for each station
 def plot_stacked_bar(num):
-    val_sum = 0  
+    # num = location of the bar plot on x axis (usually should increment by 1)
+    val_sum = 0  # this is the new starting point for the next bar plot (the start point would be the top of previous bar)
     plt.bar(num, bloor_train, align='center', color='#d53e4f', label="train")
     val_sum += bloor_train
 
-    #print val_sum
+    # the colors are color-blind friendly
     plt.bar(num, bloor_employee, bottom=val_sum, align='center', color='#f46d43', label="employee")
     val_sum+= bloor_employee
 
-    #print val_sum
     plt.bar(num, bloor_signals, bottom=val_sum, align='center', color='#fdae61',label="signals")
     val_sum+= bloor_signals
 
@@ -122,13 +123,13 @@ def plot_stacked_bar(num):
 
 
 bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc = comp_stacked_bar("FINCH")
-plot_stacked_bar(1)#, bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc)
+plot_stacked_bar(1)
 
 bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc = comp_stacked_bar("NORTH YORK")
-plot_stacked_bar(2)#, bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc)
+plot_stacked_bar(2)
 
 bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc = comp_stacked_bar("SHEPPARD")
-plot_stacked_bar(3)#, bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc)
+plot_stacked_bar(3)
 
 bloor_train, bloor_employee, bloor_signals, bloor_track, bloor_station, bloor_other, bloor_pass, bloor_weather, bloor_misc = comp_stacked_bar("YORKM")
 plot_stacked_bar(4)
